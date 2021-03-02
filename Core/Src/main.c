@@ -57,6 +57,8 @@ ADCstructure ADCchannel[3] = {0};
 float ADCOutputConverted = 0.0;  //voltage at PA0 (mV) and temperature (C)
 uint8_t ADCMode = 0;             //mode0               and mode1
 
+uint8_t SwitchButton[2] = {0};
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -121,6 +123,15 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
+	  //button event
+	  SwitchButton[0] = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);  //USER BUTTON
+
+	  if (SwitchButton[0]==0 && SwitchButton[1]==1)
+	  {
+		  ADCMode = !ADCMode;  //0 or 1
+	  }
+	  SwitchButton[1] = SwitchButton[0];
+
 	  //read analog
 	  ADCPollingUpdate();
 
@@ -128,15 +139,24 @@ int main(void)
 	  if (ADCMode == 0)
 	  {
 		  //using
-		  //
-		  //Vrev = 3.3 V
+		  //Vrev = 3300 mV
 		  //resolution 12 bits = 4096
-		  ADCOutputConverted = 3.3 / 4096.0 * ADCchannel[0].Data;
+		  //
+		  //equation : Vrev/2^resolution = Vcurrent/readedADC
+		  //
+		  ADCOutputConverted = 3300 / 4096.0 * ADCchannel[0].Data;
 	  }
 	  //mode1 read temperature (C)
 	  else if (ADCMode == 1)
 	  {
-
+		  //from datasheet (temperature sensor characteristics p.119/149)
+		  //using
+		  //V_25 = 0.76 V
+		  //Avg_slope = 2.5 mV/C
+		  //
+		  //equation : current temp = (Vsense-V_25)/Avg_slope + 25
+		  //
+		  ADCOutputConverted = ((3.3/4096.0 * ADCchannel[2].Data) - 0.76)/2.5 + 25;
 	  }
   }
   /* USER CODE END 3 */
