@@ -156,7 +156,7 @@ int main(void)
 		  //
 		  //equation : current temp = (Vsense-V_25)/Avg_slope + 25
 		  //
-		  ADCOutputConverted = ((3.3/4096.0 * ADCchannel[2].Data) - 0.76)/2.5 + 25;
+		  ADCOutputConverted = ((3.3/4096.0 * ADCchannel[2].Data) - 0.76)/0.025 + 25;
 	  }
   }
   /* USER CODE END 3 */
